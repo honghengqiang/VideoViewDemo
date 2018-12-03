@@ -6,18 +6,18 @@
     android:layout_height="match_parent"
     tools:context="com.videoviewdemo.MainActivity">
 
+    <com.videoviewdemo.CosVideoView
+        android:id="@+id/videoview"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"/>
+
+
     <RelativeLayout
         android:id="@+id/rl"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true">
-
-        <com.videoviewdemo.CosVideoView
-            android:id="@+id/videoview"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            />
 
         <include layout="@layout/layout_progress"/>
 

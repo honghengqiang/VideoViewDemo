@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean sensor_flag = true;
     private boolean stretch_flag = true;
     private VolumeReceiver mVolumeReceiver;
+    private static final int CONTROLSTATE = 2;
 
 
     private Handler handler = new Handler() {
@@ -105,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
         videoView.setVideoURI(Uri.parse(path));
         videoView.start();
         UIHandler.sendEmptyMessage(UPDATE);
+        UIHandler.sendEmptyMessageDelayed(CONTROLSTATE,4000);
     }
 
     //设置时间
@@ -138,6 +140,8 @@ public class MainActivity extends AppCompatActivity {
 
                 UIHandler.sendEmptyMessageDelayed(UPDATE,500);
 
+            }else if(msg.what == CONTROLSTATE) {
+                rl.setVisibility(View.GONE);
             }
 
         }
@@ -232,6 +236,20 @@ public class MainActivity extends AppCompatActivity {
                         //手指落在屏幕那一刻（只会调用一次）
                         lastX = x;
                         lastY = y;
+
+                        if(rl.getVisibility() == View.VISIBLE) {
+                            if(UIHandler.hasMessages(CONTROLSTATE)) {
+                                UIHandler.removeMessages(CONTROLSTATE);
+                            }
+                            rl.setVisibility(View.GONE);
+                        }else {
+                            if(UIHandler.hasMessages(CONTROLSTATE)) {
+                                UIHandler.removeMessages(CONTROLSTATE);
+                            }
+                            rl.setVisibility(View.VISIBLE);
+                            UIHandler.sendEmptyMessageDelayed(CONTROLSTATE,4000);
+                        }
+
                         break;
                     case MotionEvent.ACTION_MOVE:
                         //手指在屏幕上移动（调用多次）
@@ -438,8 +456,19 @@ public class MainActivity extends AppCompatActivity {
             handler.removeCallbacksAndMessages(0);// 移除所有消息
             handler = null;
         }
+        if(UIHandler!=null) {
+            UIHandler.removeCallbacksAndMessages(0);
+            UIHandler = null;
+        }
         if (mVolumeReceiver != null) {
             unregisterReceiver(mVolumeReceiver);// 解注册
+        }
+
+        if(sm!=null&&listener!=null) {
+            sm.unregisterListener(listener);
+        }
+        if(sm1!=null&&listener1!=null) {
+            sm1.unregisterListener(listener1);
         }
     }
 
@@ -493,7 +522,7 @@ public class MainActivity extends AppCompatActivity {
         public void onAccuracyChanged(Sensor arg0, int arg1) {}
 
         public void onSensorChanged(SensorEvent event) {
-
+            System.out.println("方向感应");
             if (sensor_flag != stretch_flag)  //只有两个不相同才开始监听行为
             {
                 float[] values = event.values;
